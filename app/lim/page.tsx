@@ -1,3 +1,5 @@
-export default function limPage() {
-  return <div>임태훈님 페이지</div>;
+"use client";
+
+export default function Page() {
+  return <div>test</div>;
 }
