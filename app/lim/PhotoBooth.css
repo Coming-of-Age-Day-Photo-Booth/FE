@@ -1,0 +1,231 @@
+/* 프리텐다드 폰트 불러오기 (추가됨) */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+
+/* 전체 화면 규격 (명시해주신 가로 1194 x 세로 834) */
+.booth-container {
+  width: 1194px;
+  height: 834px;
+  background-color: #141414;
+  color: #ffffff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 40px;
+  margin: 0 auto;
+  overflow: hidden;
+  /* 전체 영역에 프리텐다드 폰트 적용 (추가됨) */
+  font-family:
+    "Pretendard",
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    Roboto,
+    sans-serif;
+}
+
+/* 상단 로고 (고정 위치) */
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.logo {
+  width: 120px;
+  height: 30px;
+  object-fit: contain;
+}
+
+/* 1단계: 메인 컨텐츠 영역 */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px; /* 사진 그리드와 Next 버튼 사이 간격 */
+  margin-top: 20px;
+}
+
+/* 사진 그리드: 3열 2행 격자로 완벽한 오와 열 맞춤 */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px 30px; /* 세로 간격 20px, 가로 간격 30px */
+  align-items: center;
+}
+
+/* 사진 개별 규격 */
+.photo-item {
+  position: relative;
+  width: 280px;
+  height: 180px;
+  background-color: #e6f4ff;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+.photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 사진 선택 시 강조 테두리 */
+.photo-item.selected {
+  border: 3px solid #ffffff;
+}
+
+/* 우측 상단 순번 뱃지 */
+.selection-badge {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  background-color: #ffffff;
+  color: #000000;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  top: -14px;
+  right: -14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.badge-2 {
+  top: -14px;
+  right: 20px;
+}
+
+/* 우측 하단 안내 텍스트 (그리드의 6번째 칸에 위치) */
+.instruction-text {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; /* 텍스트를 해당 칸의 중앙에 배치 */
+}
+
+.main-text {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 5px 0;
+}
+
+.sub-text {
+  font-size: 15px;
+  color: #aaaaaa;
+  margin: 0;
+}
+
+/* Next 버튼 (기본 비활성화 상태) */
+.next-button {
+  width: 204px; /* 피그마 규격 고정 */
+  height: 48px; /* 피그마 규격 고정 */
+  display: flex;
+  justify-content: center;
+  align-items: center; /* 글씨를 정중앙에 배치 */
+
+  background-color: #333333;
+  color: #888888;
+  border: none;
+  border-radius: 24px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: not-allowed; /* 비활성화 상태일 때는 클릭 안 되는 마우스 커서 */
+  transition: all 0.2s ease-in-out;
+  /* 부모의 프리텐다드 폰트 상속 (추가됨) */
+  font-family: inherit;
+}
+
+/* Next 버튼 (사진 2장 모두 선택된 활성화 상태 - 3D 입체 효과) */
+.next-button.active {
+  background: linear-gradient(180deg, #3a3a3a 0%, #222222 100%);
+  color: #ffffff;
+  border: 1px solid #1a1a1a;
+  cursor: pointer; /* 활성화되면 클릭 모양으로 변경 */
+
+  /* 3D 입체 음영 효과 */
+  box-shadow:
+    inset 0px 1.5px 1px rgba(255, 255, 255, 0.25),
+    inset 0px -1.5px 1px rgba(0, 0, 0, 0.6),
+    0px 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* 마우스를 클릭했을 때 실제로 버튼이 눌리는 듯한 디테일 */
+.next-button.active:active {
+  background: #222222;
+  box-shadow: inset 0px 3px 5px rgba(0, 0, 0, 0.7);
+  transform: translateY(2px);
+}
+/* =========================================
+   2단계: 전화번호 입력 화면 
+========================================= */
+/* =========================================
+   2단계: 전화번호 입력 화면 정렬
+========================================= */
+.phone-input-main {
+  flex: 1;
+  width: 100%; /* 부모 컨테이너의 전체 너비를 사용하도록 보장 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 세로(위아래) 기준 정중앙 정렬 */
+  align-items: center; /* 가로(좌우) 기준 정중앙 정렬 */
+  gap: 30px; /* 텍스트와 입력창 사이 간격 */
+
+  /* 로고 영역이 차지하는 높이 때문에 살짝 아래로 쳐져 보일 수 있습니다.
+     시각적으로 완벽한 정중앙을 원하시면 아래 마진을 살짝 주시면 됩니다. */
+  margin-top: -40px;
+}
+
+.phone-title {
+  width: 100%; /* 타이틀 영역도 가로로 꽉 채움 */
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center; /* 글씨 가운데 정렬 */
+  margin: 0;
+}
+
+.phone-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* 아래는 아까 맞춰둔 3D 음영 입력창 효과 그대로 유지 */
+.phone-input {
+  width: 268px;
+  height: 48px;
+  background: linear-gradient(180deg, #2a2a2a 0%, #1f1f1f 100%);
+  color: #ffffff;
+  border: 1px solid #1a1a1a;
+  border-radius: 24px;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+  box-shadow:
+    inset 0px 1.5px 1px rgba(255, 255, 255, 0.15),
+    inset 0px -1.5px 1px rgba(0, 0, 0, 0.6),
+    0px 4px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease-in-out;
+  /* 부모의 프리텐다드 폰트 상속 (추가됨) */
+  font-family: inherit;
+}
+
+.phone-input::placeholder {
+  color: #888888;
+}
+
+.phone-input:focus {
+  box-shadow:
+    inset 0px 1.5px 1px rgba(255, 255, 255, 0.25),
+    inset 0px -1.5px 1px rgba(0, 0, 0, 0.6),
+    0px 0px 8px rgba(255, 255, 255, 0.2);
+}
