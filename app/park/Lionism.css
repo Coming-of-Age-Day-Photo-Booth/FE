@@ -1,5 +1,4 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
-
 @import url("https://fonts.googleapis.com/css2?family=Plaster&display=swap");
 
 * {
@@ -8,242 +7,143 @@
 
 body {
   margin: 0;
-
-  padding: 0;
-
   background: #b3b3b3;
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
   height: 100vh;
 }
 
-/* 메인 컨테이너: 가로 1194, 세로 834 (angle -90 반영 결과) */
-
 .booth-container {
   width: 1194px;
-
   height: 834px;
-
   background: #0f0f0f;
-
   position: relative;
-
   overflow: hidden;
-
   color: #ffffff;
-
   font-family: "Pretendard", sans-serif;
 }
 
-/* 로고 공통 스타일 */
+.content-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
 
+/* 로고 스타일 */
 .logo-common {
   font-family: "Plaster", system-ui;
-
   position: absolute;
-
-  display: flex;
-
-  justify-content: center;
-
-  align-items: center;
-
   white-space: nowrap;
 }
 
-/* 로그인/시작 페이지 중앙 로고 (top 331, left 507) */
-
 .main-logo {
   top: 331px;
-
-  left: 507px;
-
-  width: 180px;
-
-  height: 45px;
-
   font-size: 45px;
-
-  line-height: 100%;
 }
-
-/* 버튼 형태 (타원형) */
-
-.btn-shape {
-  position: absolute;
-
-  top: 401px;
-
-  left: 495px;
-
-  width: 204px;
-
-  height: 48px;
-
-  border-radius: 1000px;
-
-  background: rgba(255, 255, 255, 0.1);
-
-  border: 1px solid rgba(255, 255, 255, 0.15);
-
-  display: flex;
-
-  justify-content: center;
-
-  align-items: center;
-
-  color: #ffffff;
-
-  cursor: pointer;
-
-  font-size: 18px;
-}
-
-/* 로그인 텍스트 링크 */
-
-.login-link {
-  position: absolute;
-
-  top: 474px;
-
-  left: 577px;
-
-  width: 40px;
-
-  height: 21px;
-
-  font-size: 18px;
-
-  font-weight: 500;
-
-  text-decoration: underline;
-
-  text-decoration-thickness: 9%;
-
-  text-underline-offset: 25%;
-
-  background: none;
-
-  border: none;
-
-  color: #fff;
-
-  cursor: pointer;
-
-  padding: 0;
-}
-
-/* --- 사진 촬영 페이지 --- */
 
 .top-logo-small {
   top: 32px;
-
   left: 48px;
-
-  width: 120px;
-
-  height: 30px;
-
   font-size: 24px;
 }
 
+/* 버튼 스타일 */
+.btn-shape {
+  width: 204px;
+  height: 48px;
+  border-radius: 1000px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 100px; /* 로고와의 간격 */
+}
+
+.btn-placeholder {
+  width: 204px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1000px;
+  margin-top: 100px;
+}
+
+.login-link {
+  margin-top: 25px;
+  font-size: 18px;
+  background: none;
+  border: none;
+  color: #fff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* 촬영 페이지 구성 */
 .timer-number {
   position: absolute;
-
   top: 26px;
-
   left: 996px;
-
-  width: 62px;
-
-  height: 68px;
-
   font-size: 48px;
-
   font-weight: 700;
-
-  text-align: center;
 }
 
 .camera-viewfinder {
   position: absolute;
-
   top: 122px;
-
   left: 48px;
-
   width: 820px;
-
   height: 668px;
-
-  background: rgba(217, 217, 217, 0.5); /* #D9D9D980 */
-
+  background: rgba(217, 217, 217, 0.5);
   border-radius: 12px;
-
   display: flex;
-
   justify-content: center;
-
   align-items: flex-end;
-
-  padding-bottom: 24px;
+  padding-bottom: 30px;
 }
 
 .shutter-btn-white {
   width: 70px;
-
   height: 70px;
-
   border-radius: 50%;
-
   background: #ffffff;
-
   border: none;
-
   cursor: pointer;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
 }
-
-/* 우측 사진 미리보기 목록 영역 */
 
 .photo-preview-column {
   position: absolute;
-
   top: 122px;
-
   left: 903px;
-
-  width: 248px; /* angle -90 역산 */
-
-  height: 672px;
-
+  width: 248px;
+  height: 668px;
   display: flex;
-
   flex-direction: column;
-
   justify-content: space-between;
 }
 
 .preview-slot-box {
   width: 248px;
-
   height: 152px;
-
-  background: #222;
-
-  border: 1px solid #444;
-
+  background: #1a1a1a;
+  border: 1px solid #333;
   display: flex;
-
   align-items: center;
-
   justify-content: center;
+  overflow: hidden;
+}
 
-  color: #555;
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-  font-size: 24px;
+.placeholder-x {
+  color: #444;
+  font-size: 30px;
 }
