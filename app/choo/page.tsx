@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import "./PhotoBooth.css";
 
@@ -10,8 +10,16 @@ export default function Page() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const sessionUuid = searchParams.get("sessionUuid") || "";
+  const shortCode = searchParams.get("shortCode") || "";
 
   const [page, setPage] = useState<PageType>("phone");
+
+  useEffect(() => {
+    if (shortCode) {
+      setPage("save");
+    }
+  }, [shortCode]);
+
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const pressNumber = (num: string) => {
@@ -118,8 +126,8 @@ export default function Page() {
             <p>QR Code를 스캔하고 사진을 다운받으세요</p>
 
             <div className="qr-box"></div>
-
-            <h3>1R4C6</h3>
+            {}
+            <h3>{shortCode || "발급 실패"}</h3>
           </div>
 
           <div className="photo-list">

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import "./Lionism.css";
 import { useRouter } from "next/navigation";
@@ -17,9 +19,8 @@ const LionismBooth: React.FC<LionismBoothProps> = ({ initialPage = "LOGIN"}) => 
 
   // 1. [로그인] 부스 입장 인증 API 호출 (명세: POST /api/v1/booth/auth)
   const handleLogin = async () => {
-    // 프론트 루프 테스트용
-    setPage("START");
-  /*  try {
+    
+    try {
       const res = await fetch('/api/v1/booth/auth', { 
         method: 'POST',
         headers: {"Content-Type": "application/json"},
@@ -37,13 +38,19 @@ const LionismBooth: React.FC<LionismBoothProps> = ({ initialPage = "LOGIN"}) => 
         setPage("START");
       } 
       else {
-        alert("비밀번호가 올바르지 않습니다.");
+       alert("비밀번호가 올바르지 않습니다.");
       }
     }  catch (error) {
       console.error("인증 실패", error);
       alert("서버 연결에 실패했습니다.");
     }
-    */
+  
+    //if(password == 'likelion'){
+      //setPage("START");
+    //}else{
+      //alert("비밀번호가 올바르지 않습니다.");
+    //}
+    
   };
 
   // 2. [촬영] 캡처 및 업로드 (명세: POST /api/v1/booth/photos)
@@ -66,10 +73,30 @@ const LionismBooth: React.FC<LionismBoothProps> = ({ initialPage = "LOGIN"}) => 
 
   const uploadPhotos = async (finalPhotos: string[]) => {
     console.log("전체 사진 S3 업로드 중...", finalPhotos);
-    // await fetch('/api/v1/booth/photos', { method: 'POST', body: ... });
-    alert("모든 촬영이 완료되었습니다!");
-    const targetUuid = sessionUuid || "550e8400-e29b-41d4-a716-446655440000";
-    router.push(`/lim?sessionUuid=${targetUuid}`);
+    try {
+      const res = await fetch('/api/v1/booth/photos', {
+        method: 'POST', 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionUuid: sessionUuid,
+          photos: finalPhotos
+        })
+      });
+
+      if (res.ok) {
+        alert("모든 촬영이 완료되었습니다!");
+
+        const targetUuid = sessionUuid || "550e8400-e29b-41d4-a716-446655440000";
+        router.push(`/lim?sessionUuid=${targetUuid}`);
+      }
+      else {
+        alert("사진 업로드에 실패했습니다.");
+      }
+    }
+    catch (error) {
+      console.error("업로드 통신 에러:", error);
+      alert("서버 통신 에러가 발생했습니다.");
+    }  
   };
 
   // 타이머 로직

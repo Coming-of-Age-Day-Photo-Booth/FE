@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import LionismLogo from "../Lionism.svg";
 import "./admin.css";
@@ -48,6 +48,47 @@ function statusClass(status: Status) {
 
 export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
+  
+  useEffect(() => {
+    const fetchAdminOrders = async () => {
+      try {
+        const res = await fetch('/api/v1/admin/orders');
+        if (res.ok) {
+          const data = await res.json();
+          setOrders(data);
+        }
+      }
+      catch (error) {
+        console.error("어드민 데이터 로드 실패:", error);
+      }
+    };
+    fetchAdminOrders();
+
+    const interval = setInterval(fetchAdminOrders, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleStatusChange = async (id: number, status: Status) => {
+    try {
+      const res = await fetch(`/api/v1/admin/orders/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: status })
+      });
+
+      if (res.ok) {
+        // 백엔드 반영 성공 시 화면 상태 업데이트
+        setOrders((prev) =>
+          prev.map((o) => (o.id === id ? { ...o, status } : o))
+        );
+      } else {
+        alert("상태 변경 반영에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("상태 변경 통신 에러:", error);
+    }
+  };
+
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("전체");
@@ -79,13 +120,6 @@ export default function AdminPage() {
   const handleFilterChange = (status: FilterStatus) => {
     setFilterStatus(status);
     setCurrentPage(1);
-  };
-
-  const handleStatusChange = (id: number, status: Status) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, status } : o))
-    );
-    // TODO: 실제 서버 연동 시 PATCH ${process.env.NEXT_PUBLIC_API_URL}/admin/orders/${id}/status
   };
 
   const handleDownload = async (photos: [string, string]) => {
