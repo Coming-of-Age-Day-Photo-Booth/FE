@@ -41,7 +41,7 @@ export default function KimPage() {
       }
 
       try {
-        const res = await fetch(`/api/v1/photos/${shortCode}`);
+        const res = await fetch(`https://hellofriend-eulji.site/api/v1/photos/${shortCode}`);
         if (res.ok) {
           const data = await res.json(); // 백엔드에서 이미지 URL 문자열 배열을 준다고 가정
           setPhotos(data); 

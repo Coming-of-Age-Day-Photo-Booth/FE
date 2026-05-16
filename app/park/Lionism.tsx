@@ -21,7 +21,7 @@ const LionismBooth: React.FC<LionismBoothProps> = ({ initialPage = "LOGIN"}) => 
   const handleLogin = async () => {
     
     try {
-      const res = await fetch('/api/v1/booth/auth', { 
+      const res = await fetch('https://hellofriend-eulji.site/api/v1/booth/auth', { 
         method: 'POST',
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
@@ -74,7 +74,7 @@ const LionismBooth: React.FC<LionismBoothProps> = ({ initialPage = "LOGIN"}) => 
   const uploadPhotos = async (finalPhotos: string[]) => {
     console.log("전체 사진 S3 업로드 중...", finalPhotos);
     try {
-      const res = await fetch('/api/v1/booth/photos', {
+      const res = await fetch('https://hellofriend-eulji.site/api/v1/booth/photos', {
         method: 'POST', 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

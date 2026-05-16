@@ -48,11 +48,11 @@ function statusClass(status: Status) {
 
 export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
-  
+
   useEffect(() => {
     const fetchAdminOrders = async () => {
       try {
-        const res = await fetch('/api/v1/admin/orders');
+        const res = await fetch('https://hellofriend-eulji.site/api/v1/admin/orders');
         if (res.ok) {
           const data = await res.json();
           setOrders(data);
@@ -70,7 +70,7 @@ export default function AdminPage() {
 
   const handleStatusChange = async (id: number, status: Status) => {
     try {
-      const res = await fetch(`/api/v1/admin/orders/${id}/status`, {
+      const res = await fetch(`https://hellofriend-eulji.site/api/v1/admin/orders/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: status })

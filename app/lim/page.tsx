@@ -37,7 +37,7 @@ export default function PhotoBooth() {
       }
 
       try {
-        const response = await fetch(`/api/v1/booth/photos/${sessionUuid}`);
+        const response = await fetch(`https://hellofriend-eulji.site/api/v1/booth/photos/${sessionUuid}`);
 
         if (response.ok) {
           // 200 OK
@@ -52,13 +52,14 @@ export default function PhotoBooth() {
           } else {
             alert("사진 목록을 불러오는데 실패했습니다.");
           }
-        } catch (error) {
-          console.error("사진 목록 조회 통신 오류:", error);
-          alert("서버와 통신 중 오류가 발생했습니다.");
-        } finally {
-          setIsLoading(false);
         }
-      };
+      } catch (error) {
+        console.error("사진 목록 조회 통신 오류:", error);
+        alert("서버와 통신 중 오류가 발생했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
     fetchPhotos();
   }, [sessionUuid]);
@@ -109,7 +110,7 @@ export default function PhotoBooth() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/v1/booth/photos/print", {
+      const response = await fetch("https://hellofriend-eulji.site/api/v1/booth/photos/print", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // API 명세서와 100% 동일한 Body 규격
@@ -134,15 +135,18 @@ export default function PhotoBooth() {
         const errorData = await response.json().catch(() => ({}));
         if (response.status === 400) {
           alert("필수 파라미터가 누락되었습니다.");
-        } else if (response.status === 404) {
+        } 
+        else if (response.status === 404) {
           alert(
             errorData.code === "photo_not_found"
               ? "존재하지 않는 사진 ID입니다."
               : "유효하지 않은 세션입니다.",
           );
-        } else if (response.status === 500) {
+        } 
+        else if (response.status === 500) {
           alert("DB 저장에 실패했습니다. 관리자에게 문의해주세요.");
-        } else {
+        } 
+        else {
           alert("인쇄 접수에 실패했습니다. 다시 시도해주세요.");
         }
       }

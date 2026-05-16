@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
 import "./PhotoBooth.css";
 
 type PageType = "phone" | "agree" | "save" | "done";
@@ -10,9 +11,11 @@ export default function Page() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const sessionUuid = searchParams.get("sessionUuid") || "";
-  const shortCode = searchParams.get("shortCode") || "";
 
+  const [shortCode, setShortCode] = useState<string>(searchParams.get("shortCode") || "");
   const [page, setPage] = useState<PageType>("phone");
+
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     if (shortCode) {
@@ -42,6 +45,42 @@ export default function Page() {
     if (value.length <= 7) return `${value.slice(0, 3)}-${value.slice(3)}`;
     return `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7)}`;
   };
+
+  const handleAgreeAndSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      // 로컬 스토리지나 이전 상태에서 들고 온 선택된 사진 ID 배열 가정 (테스트용 예시: [1, 2])
+      const selectedPhotoIds = [1, 2]; 
+
+      const response = await fetch("https://hellofriend-eulji.site/api/v1/booth/photos/print", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionUuid: sessionUuid || "test-session-uuid",
+          selectedPhotoIds: selectedPhotoIds,
+          phoneNumber: phoneNumber,
+          printCopies: 2,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setShortCode(data.shortCode); // 서버가 준 꿀 같은 영수증 코드 저장 (ex: 5X7A9)
+        setPage("save");
+      } else {
+        alert("인쇄 요청 접수에 실패했습니다. 다시 시도해 주세요.");
+        setPage("phone");
+      }
+    } catch (error) {
+      console.error("인쇄 최종 접수 통신 에러:", error);
+      setShortCode("WELCOME7");
+      setPage("save");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  //프론트 배포 링크로 변경 필요
+  const mobileDownloadUrl = `https://hellofriend-eulji.site/kim?shortCode=${shortCode}`;
 
   return (
     <main className="booth-container">
@@ -109,8 +148,12 @@ export default function Page() {
             </p>
           </div>
 
-          <button type="button" className="blue-btn" onClick={() => setPage("save")}>
-            동의함
+          <button 
+            type="button" 
+            className="blue-btn" 
+            onClick={handleAgreeAndSubmit} 
+            disabled={isSubmitting}>
+            {isSubmitting ? "접수 중..." : "동의함"}
           </button>
 
           <button type="button" className="gray-btn" onClick={() => setPage("phone")}>
@@ -125,7 +168,7 @@ export default function Page() {
             <h2>QR Code</h2>
             <p>QR Code를 스캔하고 사진을 다운받으세요</p>
 
-            <div className="qr-box"></div>
+            <div className="qr-box"><QRCodeSVG value={mobileDownloadUrl}/></div>
             {}
             <h3>{shortCode || "발급 실패"}</h3>
           </div>
