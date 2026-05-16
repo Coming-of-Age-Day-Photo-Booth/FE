@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import "./PhotoBooth.css";
 
 type PageType = "phone" | "agree" | "save" | "done";
 
 export default function Page() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const sessionUuid = searchParams.get("sessionUuid") || "";
+
   const [page, setPage] = useState<PageType>("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
 
@@ -131,7 +136,7 @@ export default function Page() {
 
       {page === "done" && (
         <section className="done-page">
-          <button type="button" className="final-btn" onClick={() => setPage("phone")}>
+          <button type="button" className="final-btn" onClick={() => router.push("/")}>
             Done!
           </button>
         </section>

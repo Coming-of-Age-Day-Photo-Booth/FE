@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./Lionism.css";
+import { useRouter } from "next/navigation";
 
 const LionismBooth: React.FC = () => {
+  const router = useRouter();
   const [page, setPage] = useState<"LOGIN" | "START" | "CAMERA">("LOGIN");
   const [count, setCount] = useState(10);
   const [photos, setPhotos] = useState<string[]>([]);
@@ -42,6 +44,8 @@ const LionismBooth: React.FC = () => {
     console.log("전체 사진 S3 업로드 중...", finalPhotos);
     // await fetch('/api/v1/booth/photos', { method: 'POST', body: ... });
     alert("모든 촬영이 완료되었습니다!");
+    const targetUuid = sessionUuid || "550e8400-e29b-41d4-a716-446655440000";
+    router.push(`/lim?sessionUuid=${targetUuid}`);
   };
 
   // 타이머 로직

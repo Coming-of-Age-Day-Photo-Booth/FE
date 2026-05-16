@@ -1,4 +1,4 @@
-import Nav from "../components/Nav";
+//import Nav from "../components/Nav";
 
 export default function RootLayout({ children, }: 
   {children: React.ReactNode;}) 
@@ -6,7 +6,7 @@ export default function RootLayout({ children, }:
   return (
     <html lang="ko" style={{ height: "100%" }}>
       <body style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-        <Nav />
+        {/*<Nav />*/}
         {children}
       </body>
     </html>

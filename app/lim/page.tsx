@@ -37,22 +37,32 @@ export default function PhotoBooth() {
       }
 
       try {
-        const response = await fetch(`/api/v1/booth/photos/${sessionUuid}`);
+        // [임시] 백엔드 미연동 상태로 실제 fetch 요청은 잠시 막아두었습니다!
+        // const response = await fetch(`/api/v1/booth/photos/${sessionUuid}`);
 
-        if (response.ok) {
-          // 200 OK
-          const data = await response.json();
-          setPhotos(data);
-        } else {
-          // 실패 코드 처리 (API 명세서 기준 404, 500)
-          if (response.status === 404) {
-            alert("유효하지 않은 세션 UUID입니다.");
-          } else if (response.status === 500) {
-            alert("서버 오류: 사진 목록을 불러오지 못했습니다.");
-          } else {
-            alert("사진 목록을 불러오는데 실패했습니다.");
-          }
-        }
+        // if (response.ok) {
+        //   // 200 OK
+        //   const data = await response.json();
+        //   setPhotos(data);
+        // } else {
+        //   // 실패 코드 처리 (API 명세서 기준 404, 500)
+        //   if (response.status === 404) {
+        //     alert("유효하지 않은 세션 UUID입니다.");
+        //   } else if (response.status === 500) {
+        //     alert("서버 오류: 사진 목록을 불러오지 못했습니다.");
+        //   } else {
+        //     alert("사진 목록을 불러오는데 실패했습니다.");
+        //   }
+        const mockData: Photo[] = [
+          { photoId: 1, imageUrl: "#1" },
+          { photoId: 2, imageUrl: "#2" },
+          { photoId: 3, imageUrl: "#3" },
+          { photoId: 4, imageUrl: "#4" },
+        ];
+
+        setPhotos(mockData);
+        
+        
       } catch (error) {
         console.error("사진 목록 조회 통신 오류:", error);
         alert("서버와 통신 중 오류가 발생했습니다.");
@@ -90,7 +100,7 @@ export default function PhotoBooth() {
       alert("출력할 사진 2장을 모두 선택해주세요.");
       return;
     }
-    setStep(2);
+    router.push(`/choo?sessionUuid=${sessionUuid}`);
   };
 
   // ==========================================
