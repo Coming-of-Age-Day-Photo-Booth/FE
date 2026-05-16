@@ -2,24 +2,48 @@ import React, { useState, useEffect } from "react";
 import "./Lionism.css";
 import { useRouter } from "next/navigation";
 
-const LionismBooth: React.FC = () => {
+interface LionismBoothProps {
+  initialPage?: "LOGIN" | "START" | "CAMERA";
+}
+
+const LionismBooth: React.FC<LionismBoothProps> = ({ initialPage = "LOGIN"}) => {
   const router = useRouter();
-  const [page, setPage] = useState<"LOGIN" | "START" | "CAMERA">("LOGIN");
+
+  const [page, setPage] = useState<"LOGIN" | "START" | "CAMERA">(initialPage);
   const [count, setCount] = useState(10);
   const [photos, setPhotos] = useState<string[]>([]);
   const [sessionUuid, setSessionUuid] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
   // 1. [로그인] 부스 입장 인증 API 호출 (명세: POST /api/v1/booth/auth)
   const handleLogin = async () => {
-    try {
-      /* const res = await fetch('/api/v1/booth/auth', { method: 'POST', ... });
-      const data = await res.json();
-      setSessionUuid(data.sessionUuid);
-      */
-      setPage("START");
-    } catch (err) {
-      console.error("인증 실패", err);
+    // 프론트 루프 테스트용
+    setPage("START");
+  /*  try {
+      const res = await fetch('/api/v1/booth/auth', { 
+        method: 'POST',
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          password: password,
+        }),
+      });
+    
+      if (res.ok) {
+        const data = await res.json();
+        if (data.sessionUuid) {
+          setSessionUuid(data.sessionUuid);
+        }
+      
+        setPage("START");
+      } 
+      else {
+        alert("비밀번호가 올바르지 않습니다.");
+      }
+    }  catch (error) {
+      console.error("인증 실패", error);
+      alert("서버 연결에 실패했습니다.");
     }
+    */
   };
 
   // 2. [촬영] 캡처 및 업로드 (명세: POST /api/v1/booth/photos)
@@ -67,7 +91,21 @@ const LionismBooth: React.FC = () => {
       {page === "LOGIN" && (
         <div className="content-center">
           <div className="logo-common main-logo">Lionism</div>
-          <div className="btn-placeholder"></div>
+          <input
+            type="password"
+            placeholder=""
+            className="btn-placeholder"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{
+              border: "none",
+              textAlign: "center",
+              fontSize: "18px",
+              outline: "none",
+              color: "#333333"
+            }}
+          />
+
           <button className="login-link" onClick={handleLogin}>
             login
           </button>
