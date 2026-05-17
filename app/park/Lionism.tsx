@@ -247,10 +247,8 @@ const LionismBooth: React.FC = () => {
           <div className="photo-preview-column">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="preview-slot-box">
-                {photos[i] ? (
+                {photos[i] && (
                   <img src={photos[i]} alt="captured" className="preview-img" />
-                ) : (
-                  <div className="placeholder-x">✕</div>
                 )}
               </div>
             ))}
