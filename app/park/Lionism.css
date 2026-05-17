@@ -5,20 +5,26 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   background: #b3b3b3;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
 }
 
+/* 1194x834 디자인을 화면 비율에 맞춰 중앙에 꽉 차게 스케일 */
 .booth-container {
   width: 1194px;
   height: 834px;
   background: #0f0f0f;
-  position: relative;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(min(100vw / 1194px, 100vh / 834px));
   overflow: hidden;
   color: #ffffff;
   font-family: "Pretendard", sans-serif;
@@ -141,9 +147,4 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.placeholder-x {
-  color: #444;
-  font-size: 30px;
 }

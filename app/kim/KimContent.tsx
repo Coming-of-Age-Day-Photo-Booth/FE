@@ -83,12 +83,7 @@ export default function KimContent() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={photos[i]} alt={`photo ${i + 1}`} className="kim-image" />
               ) : (
-                <div className="kim-placeholder">
-                  <svg viewBox="0 0 400 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="0" y1="0" x2="400" y2="300" stroke="#ccc" strokeWidth="1" />
-                    <line x1="400" y1="0" x2="0" y2="300" stroke="#ccc" strokeWidth="1" />
-                  </svg>
-                </div>
+                <div className="kim-placeholder" />
               )}
             </div>
           ))}

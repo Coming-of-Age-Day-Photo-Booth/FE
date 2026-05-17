@@ -1,18 +1,27 @@
 /* 프리텐다드 폰트 불러오기 (추가됨) */
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
 
-/* 전체 화면 규격 (명시해주신 가로 1194 x 세로 834) */
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 전체 화면 규격 (1194x834 디자인을 화면 비율에 맞춰 중앙에 스케일) */
 .booth-container {
   width: 1194px;
   height: 834px;
   background-color: #141414;
   color: #ffffff;
-  position: relative;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(min(100vw / 1194px, 100vh / 834px));
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   padding: 40px;
-  margin: 0 auto;
   overflow: hidden;
   /* 전체 영역에 프리텐다드 폰트 적용 (추가됨) */
   font-family:
