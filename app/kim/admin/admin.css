@@ -275,6 +275,12 @@
   color: #fff;
 }
 
+.admin-download-btn:disabled {
+  color: #555;
+  cursor: default;
+  text-decoration: none;
+}
+
 .admin-pagination {
   display: flex;
   justify-content: center;
