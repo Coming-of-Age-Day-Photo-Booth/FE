@@ -339,7 +339,28 @@ body {
 }
 
 .done-btn {
-  display: none;
+  position: absolute;
+  top: 32px;
+  right: 48px;
+
+  width: 120px;
+  height: 44px;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1000px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 10;
+
+  transition: background 0.2s;
+}
+
+.done-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 /* 완료 화면 */
