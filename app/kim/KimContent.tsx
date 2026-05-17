@@ -8,27 +8,37 @@ import "./kim.css";
 
 type PageType = "download";
 
+interface Photo {
+  photoId: number;
+  imageUrl: string;
+}
+
 const PHOTO_COUNT = 5;
 
 export default function KimContent() {
   const searchParams = useSearchParams();
-  const shortCode = searchParams.get("shortCode") || "";
+  // QR(/choo)에서 넘어온 세션 식별자
+  const sessionUuid = searchParams.get("sessionUuid") || "";
 
   const [page] = useState<PageType>("download");
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<Photo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const getMobilePhotos = async () => {
-      if(!shortCode) {
+      if (!sessionUuid) {
         setIsLoading(false);
         return;
       }
 
       try {
-        const res = await fetch(`https://hellofriend-eulji.site/api/v1/photos/${shortCode}`);
+        const res = await fetch(
+          `https://hellofriend-eulji.site/api/v1/booth/photos/${sessionUuid}`,
+        );
         if (res.ok) {
-          const data = await res.json(); // 백엔드에서 이미지 URL 문자열 배열을 준다고 가정
+          // 백엔드 응답 규격: { photoId, imageUrl }[]
+          const data: Photo[] = await res.json();
           setPhotos(data);
         }
       } catch (error) {
@@ -38,7 +48,7 @@ export default function KimContent() {
       }
     };
     getMobilePhotos();
-  }, [shortCode]);
+  }, [sessionUuid]);
 
   const handleDownload = async () => {
     if (photos.length === 0) {
@@ -46,22 +56,26 @@ export default function KimContent() {
       return;
     }
 
-    for (let i = 0; i < photos.length; i++) {
-      try {
-        const res = await fetch(photos[i]);
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `photo-${i + 1}.jpg`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+    setIsDownloading(true);
+    try {
+      for (let i = 0; i < photos.length; i++) {
+        try {
+          const res = await fetch(photos[i].imageUrl);
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `lionism-photo-${i + 1}.jpg`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          console.error("개별 이미지 다운로드 실패:", err);
+        }
       }
-      catch (err) {
-        console.error("개별 이미지 다운로드 실패:", err);
-      }
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -81,7 +95,11 @@ export default function KimContent() {
             <div key={i} className="kim-image-wrapper">
               {photos[i] ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={photos[i]} alt={`photo ${i + 1}`} className="kim-image" />
+                <img
+                  src={photos[i].imageUrl}
+                  alt={`photo ${i + 1}`}
+                  className="kim-image"
+                />
               ) : (
                 <div className="kim-placeholder" />
               )}
@@ -91,8 +109,12 @@ export default function KimContent() {
       )}
 
       <div className="kim-download-bar">
-        <button className="kim-download-btn" onClick={handleDownload}>
-          Download
+        <button
+          className="kim-download-btn"
+          onClick={handleDownload}
+          disabled={photos.length === 0 || isDownloading}
+        >
+          {isDownloading ? "저장 중..." : "Download"}
         </button>
       </div>
     </div>
