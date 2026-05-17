@@ -101,11 +101,12 @@ export default function AdminPage() {
 
   const handleStatusChange = async (shortCode: string, status: Status) => {
     try {
-      const res = await fetch(`https://hellofriend-eulji.site/api/v1/admin/orders/${shortCode}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: STATUS_VALUE[status] })
-      });
+      // 백엔드가 상태값을 @RequestParam 으로 받으므로, JSON body 가 아닌
+      // 쿼리 스트링(?newStatus=COMPLETED)으로 전달한다.
+      const res = await fetch(
+        `https://hellofriend-eulji.site/api/v1/admin/orders/${shortCode}/status?newStatus=${STATUS_VALUE[status]}`,
+        { method: 'PATCH' },
+      );
 
       if (res.ok) {
         // 백엔드 반영 성공 시 화면 상태 업데이트
