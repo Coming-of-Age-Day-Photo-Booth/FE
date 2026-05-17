@@ -13,12 +13,28 @@ interface Photo {
   imageUrl: string;
 }
 
+// 서버 응답이 문자열 배열이든 { photoId, imageUrl } 객체 배열이든 Photo[] 로 정규화한다.
+function normalizePhotos(data: unknown): Photo[] {
+  if (!Array.isArray(data)) return [];
+  return data
+    .map((item, i): Photo | null => {
+      if (typeof item === "string") return { photoId: i, imageUrl: item };
+      if (item && typeof item === "object" && "imageUrl" in item) {
+        const obj = item as { photoId?: number; imageUrl: string };
+        return { photoId: obj.photoId ?? i, imageUrl: obj.imageUrl };
+      }
+      return null;
+    })
+    .filter((p): p is Photo => p !== null);
+}
+
 const PHOTO_COUNT = 5;
 
 export default function KimContent() {
   const searchParams = useSearchParams();
-  // QR(/choo)에서 넘어온 세션 식별자
+  // QR(/choo)로 들어온 경우 sessionUuid, 고유번호 조회(/find)로 들어온 경우 shortCode
   const sessionUuid = searchParams.get("sessionUuid") || "";
+  const shortCode = searchParams.get("shortCode") || "";
 
   const [page] = useState<PageType>("download");
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -27,19 +43,21 @@ export default function KimContent() {
 
   useEffect(() => {
     const getMobilePhotos = async () => {
-      if (!sessionUuid) {
+      // 조회 방식 결정: 고유번호(shortCode) 우선, 없으면 QR 세션(sessionUuid)
+      let url = "";
+      if (shortCode) {
+        url = `https://hellofriend-eulji.site/api/v1/photos/${shortCode}`;
+      } else if (sessionUuid) {
+        url = `https://hellofriend-eulji.site/api/v1/booth/photos/${sessionUuid}`;
+      } else {
         setIsLoading(false);
         return;
       }
 
       try {
-        const res = await fetch(
-          `https://hellofriend-eulji.site/api/v1/booth/photos/${sessionUuid}`,
-        );
+        const res = await fetch(url);
         if (res.ok) {
-          // 백엔드 응답 규격: { photoId, imageUrl }[]
-          const data: Photo[] = await res.json();
-          setPhotos(data);
+          setPhotos(normalizePhotos(await res.json()));
         }
       } catch (error) {
         console.error("모바일 사진 조회 실패:", error);
@@ -48,7 +66,7 @@ export default function KimContent() {
       }
     };
     getMobilePhotos();
-  }, [sessionUuid]);
+  }, [sessionUuid, shortCode]);
 
   const handleDownload = async () => {
     if (photos.length === 0) {
