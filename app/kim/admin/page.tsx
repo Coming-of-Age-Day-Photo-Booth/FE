@@ -19,8 +19,9 @@ interface Order {
   photos: [string, string];
 }
 
-// TODO: 실제 서버 연동 시 API polling 또는 WebSocket으로 교체
-// ex) GET ${process.env.NEXT_PUBLIC_API_URL}/admin/orders
+// 실제 주문내역은 GET /api/v1/admin/orders 로 서버에서 불러온다 (아래 useEffect 참고).
+// 아래 더미 데이터는 서버 연동 전 테스트용으로, 현재는 사용하지 않음.
+/*
 const MOCK_ORDERS: Order[] = [
   { id: 1,  uniqueCode: "1A1A1", phoneNumber: "010-1234-5678", receivedAt: "2026.05.18 14:23:12", status: "진행 전",  photos: ["https://picsum.photos/seed/a/1600/900", "https://picsum.photos/seed/a/1600/900"] },
   { id: 2,  uniqueCode: "2B3C4", phoneNumber: "010-2345-6789", receivedAt: "2026.05.18 14:31:05", status: "진행 중",  photos: ["https://picsum.photos/seed/b/1600/900", "https://picsum.photos/seed/c/1600/900"] },
@@ -35,6 +36,7 @@ const MOCK_ORDERS: Order[] = [
   { id: 11, uniqueCode: "1T2U3", phoneNumber: "010-1234-5670", receivedAt: "2026.05.18 16:29:55", status: "진행 전",  photos: ["https://picsum.photos/seed/t/1600/900", "https://picsum.photos/seed/u/1600/900"] },
   { id: 12, uniqueCode: "2V4W5", phoneNumber: "010-2345-6780", receivedAt: "2026.05.18 16:44:03", status: "완료",     photos: ["https://picsum.photos/seed/v/1600/900", "https://picsum.photos/seed/w/1600/900"] },
 ];
+*/
 
 const STATUS_OPTIONS: Status[] = ["진행 전", "진행 중", "완료"];
 const FILTER_OPTIONS: FilterStatus[] = ["전체", "진행 전", "진행 중", "완료"];
@@ -47,7 +49,8 @@ function statusClass(status: Status) {
 }
 
 export default function AdminPage() {
-  const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
+  // 초기값은 빈 배열, 실제 데이터는 useEffect 의 fetch 로 채운다.
+  const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
     const fetchAdminOrders = async () => {
