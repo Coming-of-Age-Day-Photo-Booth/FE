@@ -6,6 +6,9 @@ import "./Lionism.css";
 // 백엔드 팀원분이 제공한 실제 배포 도메인 적용
 const API_BASE_URL = "https://hellofriend-eulji.site";
 
+// 부스에서 촬영하는 사진 장수 (선택/QR/다운로드 페이지가 모두 5장 기준으로 동작)
+const TOTAL_PHOTOS = 5;
+
 const LionismBooth: React.FC = () => {
   useBoothScale();
   const router = useRouter();
@@ -98,7 +101,7 @@ const LionismBooth: React.FC = () => {
 
   // 3. [촬영] 비디오 화면 캡처 및 좌우반전 (기존 유지)
   const onCapture = async () => {
-    if (photos.length >= 4) return;
+    if (photos.length >= TOTAL_PHOTOS) return;
 
     let capturedImg = "";
 
@@ -126,7 +129,7 @@ const LionismBooth: React.FC = () => {
     setPhotos(newPhotos);
     setCount(10);
 
-    if (newPhotos.length === 4) {
+    if (newPhotos.length === TOTAL_PHOTOS) {
       await uploadPhotos(newPhotos);
     }
   };
@@ -168,7 +171,7 @@ const LionismBooth: React.FC = () => {
   // 타이머 로직 (기존 유지)
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (page === "CAMERA" && photos.length < 4) {
+    if (page === "CAMERA" && photos.length < TOTAL_PHOTOS) {
       if (count > 0) {
         timer = setTimeout(() => setCount(count - 1), 1000);
       } else {
@@ -247,7 +250,7 @@ const LionismBooth: React.FC = () => {
           </div>
 
           <div className="photo-preview-column">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(TOTAL_PHOTOS)].map((_, i) => (
               <div key={i} className="preview-slot-box">
                 {photos[i] && (
                   <img src={photos[i]} alt="captured" className="preview-img" />
