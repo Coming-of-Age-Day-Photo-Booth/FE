@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
+import { useBoothScale } from "../useBoothScale";
 import "./PhotoBooth.css";
 
 type PageType = "phone" | "agree" | "save" | "done";
@@ -13,6 +14,7 @@ interface Photo {
 }
 
 export default function ChooContent() {
+  useBoothScale();
   const searchParams = useSearchParams();
   const router = useRouter();
   const sessionUuid = searchParams.get("sessionUuid") || "";

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation"; // 라우팅을 위해 useRouter 추가
 import "./PhotoBooth.css";
 import Image from "next/image";
+import { useBoothScale } from "../useBoothScale";
 import Logo from "./Lionism.png";
 
 interface Photo {
@@ -12,6 +13,7 @@ interface Photo {
 }
 
 export default function PhotoBoothContent() {
+  useBoothScale();
   const searchParams = useSearchParams();
   const router = useRouter();
 

@@ -25,7 +25,7 @@ body {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(min(100vw / 1194px, 100vh / 834px));
+  transform: translate(-50%, -50%) scale(var(--booth-scale, 1));
   overflow: hidden;
 }
 
