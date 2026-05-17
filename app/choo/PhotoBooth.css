@@ -338,11 +338,28 @@ body {
   object-fit: cover;
 }
 
-.done-btn {
+.done-area {
   position: absolute;
   top: 32px;
   right: 48px;
 
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 10;
+}
+
+.done-countdown {
+  min-width: 30px;
+
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.done-btn {
   width: 120px;
   height: 44px;
 
@@ -354,7 +371,6 @@ body {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  z-index: 10;
 
   transition: background 0.2s;
 }

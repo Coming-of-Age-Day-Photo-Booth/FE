@@ -35,6 +35,9 @@ export default function ChooContent() {
   // QR 페이지에서 함께 보여줄 촬영 원본 사진 목록
   const [photos, setPhotos] = useState<Photo[]>([]);
 
+  // 완료까지 남은 시간(초). QR 페이지에서 20초부터 카운트다운한다.
+  const [doneCountdown, setDoneCountdown] = useState(20);
+
   // ==========================================
   // QR 페이지 진입 시 세션의 사진 목록 조회 (GET)
   // ==========================================
@@ -58,12 +61,22 @@ export default function ChooContent() {
     fetchPhotos();
   }, [page, sessionUuid]);
 
-  // QR 페이지에서 완료 버튼을 누르지 않으면 20초 후 자동으로 완료 처리한다.
+  // QR 페이지에서 완료 버튼을 누르지 않으면 20초 카운트다운 후 자동 완료한다.
   // 완료 버튼을 누르면 page 가 바뀌면서 cleanup 으로 타이머가 취소된다.
   useEffect(() => {
     if (page !== "save") return;
-    const timer = setTimeout(() => setPage("done"), 20000);
-    return () => clearTimeout(timer);
+
+    let remaining = 20;
+    const interval = setInterval(() => {
+      remaining -= 1;
+      setDoneCountdown(remaining);
+      if (remaining <= 0) {
+        clearInterval(interval);
+        setPage("done");
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, [page]);
 
   const pressNumber = (num: string) => {
@@ -240,9 +253,12 @@ export default function ChooContent() {
             ))}
           </div>
 
-          <button type="button" className="done-btn" onClick={() => setPage("done")}>
-            완료
-          </button>
+          <div className="done-area">
+            <span className="done-countdown">{doneCountdown}</span>
+            <button type="button" className="done-btn" onClick={() => setPage("done")}>
+              완료
+            </button>
+          </div>
         </section>
       )}
 
