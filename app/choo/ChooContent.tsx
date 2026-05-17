@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import "./PhotoBooth.css";
@@ -12,16 +12,16 @@ export default function ChooContent() {
   const router = useRouter();
   const sessionUuid = searchParams.get("sessionUuid") || "";
 
-  const [shortCode, setShortCode] = useState<string>(searchParams.get("shortCode") || "");
+  // /lim에서 선택한 사진 ID 목록 (예: "?photoIds=1,2")
+  const selectedPhotoIds = (searchParams.get("photoIds") || "")
+    .split(",")
+    .map((id) => Number(id))
+    .filter((id) => !Number.isNaN(id));
+
+  const [shortCode, setShortCode] = useState<string>("");
   const [page, setPage] = useState<PageType>("phone");
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (shortCode) {
-      setPage("save");
-    }
-  }, [shortCode]);
 
   const [phoneNumber, setPhoneNumber] = useState("");
 
@@ -47,11 +47,13 @@ export default function ChooContent() {
   };
 
   const handleAgreeAndSubmit = async () => {
+    if (selectedPhotoIds.length === 0) {
+      alert("선택된 사진 정보가 없습니다. 사진 선택부터 다시 진행해주세요.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // 로컬 스토리지나 이전 상태에서 들고 온 선택된 사진 ID 배열 가정 (테스트용 예시: [1, 2])
-      const selectedPhotoIds = [1, 2];
-
       const response = await fetch("https://hellofriend-eulji.site/api/v1/booth/photos/print", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
