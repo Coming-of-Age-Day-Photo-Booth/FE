@@ -129,12 +129,13 @@ body {
   height: 668px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 8px;
 }
 
 .preview-slot-box {
   width: 248px;
-  height: 152px;
+  flex: 1;
+  min-height: 0;
   background: #1a1a1a;
   border: 1px solid #333;
   display: flex;
