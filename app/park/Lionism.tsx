@@ -288,10 +288,7 @@ const LionismBooth: React.FC = () => {
             />
             <button
               className="shutter-btn-white"
-              onClick={() => {
-                unlockAudio();
-                onCapture();
-              }}
+              onClick={onCapture}
               style={{ zIndex: 10, marginBottom: "30px" }}
             ></button>
           </div>
