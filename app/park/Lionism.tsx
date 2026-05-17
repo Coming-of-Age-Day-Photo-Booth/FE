@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useBoothScale } from "../useBoothScale";
 import "./Lionism.css";
 
 // 백엔드 팀원분이 제공한 실제 배포 도메인 적용
 const API_BASE_URL = "https://hellofriend-eulji.site";
 
 const LionismBooth: React.FC = () => {
+  useBoothScale();
   const router = useRouter();
   const [page, setPage] = useState<"LOGIN" | "START" | "CAMERA">("LOGIN");
   const [count, setCount] = useState(10);
