@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, type FormEvent } from "react";
 import Image from "next/image";
 import LionismLogo from "../Lionism.svg";
 import "./admin.css";
@@ -61,6 +61,10 @@ const STATUS_OPTIONS: Status[] = ["진행 전", "진행 중", "완료"];
 const FILTER_OPTIONS: FilterStatus[] = ["전체", "진행 전", "진행 중", "완료"];
 const PAGE_SIZE = 10;
 
+// 관리자 페이지 접근 비밀번호. 바꾸려면 이 값만 수정하면 된다.
+// 주의: 클라이언트(브라우저) 번들에 포함되므로 개발자도구로 열람이 가능하다.
+const ADMIN_PASSWORD = "lionkingonly";
+
 function statusClass(status: Status) {
   if (status === "진행 전") return "before";
   if (status === "진행 중") return "ongoing";
@@ -68,10 +72,28 @@ function statusClass(status: Status) {
 }
 
 export default function AdminPage() {
+  // 비밀번호 게이트 상태
+  const [authed, setAuthed] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [gateError, setGateError] = useState(false);
+
+  const handleGateSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (passwordInput === ADMIN_PASSWORD) {
+      setAuthed(true);
+      setGateError(false);
+    } else {
+      setGateError(true);
+    }
+  };
+
   // 초기값은 빈 배열, 실제 데이터는 useEffect 의 fetch 로 채운다.
   const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
+    // 인증 전에는 데이터를 불러오지 않는다
+    if (!authed) return;
+
     const fetchAdminOrders = async () => {
       try {
         const res = await fetch('https://hellofriend-eulji.site/api/v1/admin/orders');
@@ -97,7 +119,7 @@ export default function AdminPage() {
 
     const interval = setInterval(fetchAdminOrders, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [authed]);
 
   const handleStatusChange = async (shortCode: string, status: Status) => {
     try {
@@ -168,6 +190,40 @@ export default function AdminPage() {
       URL.revokeObjectURL(url);
     }
   };
+
+  // 인증 전: 비밀번호 입력 화면만 노출 (URL 로 직접 들어와도 이 화면이 막는다)
+  if (!authed) {
+    return (
+      <div className="admin-container admin-gate">
+        <form className="admin-gate-box" onSubmit={handleGateSubmit}>
+          <Image
+            src={LionismLogo}
+            alt="Lionism"
+            className="admin-logo"
+            loading="eager"
+          />
+          <h1 className="admin-gate-title">관리자 로그인</h1>
+          <input
+            type="password"
+            className="admin-gate-input"
+            placeholder="비밀번호"
+            value={passwordInput}
+            onChange={(e) => {
+              setPasswordInput(e.target.value);
+              setGateError(false);
+            }}
+            autoFocus
+          />
+          {gateError && (
+            <p className="admin-gate-error">비밀번호가 올바르지 않습니다.</p>
+          )}
+          <button type="submit" className="admin-gate-btn">
+            입장
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-container">
