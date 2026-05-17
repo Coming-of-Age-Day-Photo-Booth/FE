@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import "./Lionism.css";
 
 // 백엔드 팀원분이 제공한 실제 배포 도메인 적용
 const API_BASE_URL = "https://hellofriend-eulji.site";
 
 const LionismBooth: React.FC = () => {
+  const router = useRouter();
   const [page, setPage] = useState<"LOGIN" | "START" | "CAMERA">("LOGIN");
   const [count, setCount] = useState(10);
   const [photos, setPhotos] = useState<string[]>([]);
@@ -150,7 +152,8 @@ const LionismBooth: React.FC = () => {
         throw new Error("사진 업로드 실패");
       }
 
-      alert("모든 촬영 및 백엔드 서버 전송이 완료되었습니다!");
+      // 업로드 성공 시 사진 선택 페이지로 이동
+      router.push(`/lim?sessionUuid=${sessionUuid}`);
     } catch (err) {
       console.error("업로드 에러:", err);
       // 서버가 닫혀있을 때를 대비해 업로드 실패 시에도 사용자에게 안내만 하고 멈추도록 예외 처리
