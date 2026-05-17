@@ -114,8 +114,12 @@ export default function ChooContent() {
       setIsSubmitting(false);
     }
   };
-  //프론트 배포 링크로 변경 필요
-  const mobileDownloadUrl = `https://hellofriend-eulji.site/kim?shortCode=${shortCode}`;
+  // QR은 이 프론트엔드가 배포된 도메인의 /kim(모바일 저장 페이지)으로 연결한다.
+  // window.location.origin 을 쓰면 개발/배포 환경에 상관없이 항상 올바른 도메인이 된다.
+  const mobileDownloadUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/kim?shortCode=${shortCode}`
+      : "";
 
   return (
     <main className="booth-container">
