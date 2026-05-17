@@ -7,17 +7,36 @@ import "./admin.css";
 
 type Status = "진행 전" | "진행 중" | "완료";
 type FilterStatus = "전체" | Status;
+type ServerStatus = "PENDING" | "PROCESSING" | "COMPLETED";
 
-interface Order {
-  id: number;
-  uniqueCode: string;
+// 서버(GET /api/v1/admin/orders) 응답 한 건의 규격
+interface ServerOrder {
+  shortCode: string;
   phoneNumber: string;
-  receivedAt: string;
-  status: Status;
-  // 사용자가 선택한 출력용 사진 2장 (동일 사진 2장일 수도 있음)
-  // TODO: 실제 서버 연동 시 API 응답의 selectedPhotoUrls 필드로 교체
-  photos: [string, string];
+  status: ServerStatus;
+  imageUrlsToPrint: string[];
 }
+
+// 화면에서 사용하는 주문 데이터
+interface Order {
+  shortCode: string;
+  phoneNumber: string;
+  receivedAt: string; // 서버 응답에 없으면 "-" 로 표시
+  status: Status;
+  photos: string[];
+}
+
+// 서버 status enum ↔ 화면 표시값 매핑
+const STATUS_LABEL: Record<ServerStatus, Status> = {
+  PENDING: "진행 전",
+  PROCESSING: "진행 중",
+  COMPLETED: "완료",
+};
+const STATUS_VALUE: Record<Status, ServerStatus> = {
+  "진행 전": "PENDING",
+  "진행 중": "PROCESSING",
+  "완료": "COMPLETED",
+};
 
 // 실제 주문내역은 GET /api/v1/admin/orders 로 서버에서 불러온다 (아래 useEffect 참고).
 // 아래 더미 데이터는 서버 연동 전 테스트용으로, 현재는 사용하지 않음.
@@ -57,8 +76,17 @@ export default function AdminPage() {
       try {
         const res = await fetch('https://hellofriend-eulji.site/api/v1/admin/orders');
         if (res.ok) {
-          const data = await res.json();
-          setOrders(data);
+          // 서버 응답(ServerOrder[])을 화면용 Order[] 로 변환
+          const data: ServerOrder[] = await res.json();
+          setOrders(
+            data.map((o) => ({
+              shortCode: o.shortCode,
+              phoneNumber: o.phoneNumber,
+              receivedAt: "-", // 서버 응답에 접수일시가 없어 임시로 "-" 표시
+              status: STATUS_LABEL[o.status],
+              photos: o.imageUrlsToPrint,
+            })),
+          );
         }
       }
       catch (error) {
@@ -71,18 +99,18 @@ export default function AdminPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleStatusChange = async (id: number, status: Status) => {
+  const handleStatusChange = async (shortCode: string, status: Status) => {
     try {
-      const res = await fetch(`https://hellofriend-eulji.site/api/v1/admin/orders/${id}/status`, {
+      const res = await fetch(`https://hellofriend-eulji.site/api/v1/admin/orders/${shortCode}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: status })
+        body: JSON.stringify({ status: STATUS_VALUE[status] })
       });
 
       if (res.ok) {
         // 백엔드 반영 성공 시 화면 상태 업데이트
         setOrders((prev) =>
-          prev.map((o) => (o.id === id ? { ...o, status } : o))
+          prev.map((o) => (o.shortCode === shortCode ? { ...o, status } : o))
         );
       } else {
         alert("상태 변경 반영에 실패했습니다.");
@@ -101,7 +129,7 @@ export default function AdminPage() {
     return orders.filter((o) => {
       const matchSearch =
         q === "" ||
-        o.uniqueCode.toLowerCase().includes(q) ||
+        o.shortCode.toLowerCase().includes(q) ||
         o.phoneNumber.replace(/-/g, "").includes(q.replace(/-/g, ""));
       const matchFilter =
         filterStatus === "전체" || o.status === filterStatus;
@@ -125,7 +153,7 @@ export default function AdminPage() {
     setCurrentPage(1);
   };
 
-  const handleDownload = async (photos: [string, string]) => {
+  const handleDownload = async (photos: string[]) => {
     for (let i = 0; i < photos.length; i++) {
       const res = await fetch(photos[i]);
       const blob = await res.blob();
@@ -186,10 +214,10 @@ export default function AdminPage() {
                   <td colSpan={6} className="admin-empty">검색 결과가 없습니다.</td>
                 </tr>
               ) : (
-                pageOrders.map((order) => (
-                  <tr key={order.id}>
-                    <td>{order.id}</td>
-                    <td>{order.uniqueCode}</td>
+                pageOrders.map((order, index) => (
+                  <tr key={order.shortCode}>
+                    <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
+                    <td>{order.shortCode}</td>
                     <td>{order.phoneNumber}</td>
                     <td>{order.receivedAt}</td>
                     <td>
@@ -197,7 +225,7 @@ export default function AdminPage() {
                         className={`admin-status-select admin-status-${statusClass(order.status)}`}
                         value={order.status}
                         onChange={(e) =>
-                          handleStatusChange(order.id, e.target.value as Status)
+                          handleStatusChange(order.shortCode, e.target.value as Status)
                         }
                       >
                         {STATUS_OPTIONS.map((s) => (
