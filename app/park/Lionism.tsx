@@ -9,9 +9,6 @@ const API_BASE_URL = "https://hellofriend-eulji.site";
 // 부스에서 촬영하는 사진 장수 (선택/QR/다운로드 페이지가 모두 5장 기준으로 동작)
 const TOTAL_PHOTOS = 5;
 
-// public/shutter_sound.mp3 — 사진 촬영 시 재생할 셔터음
-const SHUTTER_SOUND_SRC = "/shutter_sound.mp3";
-
 const LionismBooth: React.FC = () => {
   useBoothScale();
   const router = useRouter();
@@ -26,38 +23,6 @@ const LionismBooth: React.FC = () => {
   // 카메라 구동을 위한 Ref
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-
-  // 셔터음(mp3) 재생용 Audio 엘리먼트
-  const shutterAudioRef = useRef<HTMLAudioElement | null>(null);
-
-  // 사용자 제스처(Start/셔터 버튼)에서 호출한다. iOS 는 제스처로 한 번
-  // 재생을 트리거해 둔 오디오만 이후 자동(타이머) 재생이 허용되므로,
-  // 음소거 상태로 재생→정지하여 오디오를 '잠금 해제' 해 둔다.
-  const unlockAudio = () => {
-    if (!shutterAudioRef.current) {
-      shutterAudioRef.current = new Audio(SHUTTER_SOUND_SRC);
-    }
-    const audio = shutterAudioRef.current;
-    audio.muted = true;
-    audio
-      .play()
-      .then(() => {
-        audio.pause();
-        audio.currentTime = 0;
-        audio.muted = false;
-      })
-      .catch(() => {
-        audio.muted = false;
-      });
-  };
-
-  // 셔터음 재생 (촬영 순간 호출)
-  const playShutterSound = () => {
-    const audio = shutterAudioRef.current;
-    if (!audio) return;
-    audio.currentTime = 0;
-    audio.play().catch((err) => console.warn("셔터음 재생 실패:", err));
-  };
 
   // 1. [로그인] 부스 입장 인증 API 호출 (명세: POST /api/v1/booth/auth)
   const handleLogin = async () => {
@@ -137,9 +102,6 @@ const LionismBooth: React.FC = () => {
   // 3. [촬영] 비디오 화면 캡처 및 좌우반전 (기존 유지)
   const onCapture = async () => {
     if (photos.length >= TOTAL_PHOTOS) return;
-
-    // 촬영 순간 셔터음 재생
-    playShutterSound();
 
     let capturedImg = "";
 
@@ -250,13 +212,7 @@ const LionismBooth: React.FC = () => {
       {page === "START" && (
         <div className="content-center">
           <div className="logo-common main-logo">Lionism</div>
-          <button
-            className="btn-shape"
-            onClick={() => {
-              unlockAudio();
-              setPage("CAMERA");
-            }}
-          >
+          <button className="btn-shape" onClick={() => setPage("CAMERA")}>
             Start!
           </button>
         </div>
