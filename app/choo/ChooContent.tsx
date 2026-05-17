@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import "./PhotoBooth.css";
 
 type PageType = "phone" | "agree" | "save" | "done";
+
+interface Photo {
+  photoId: number;
+  imageUrl: string;
+}
 
 export default function ChooContent() {
   const searchParams = useSearchParams();
@@ -24,6 +29,32 @@ export default function ChooContent() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [phoneNumber, setPhoneNumber] = useState("");
+
+  // QR 페이지에서 함께 보여줄 촬영 원본 사진 목록
+  const [photos, setPhotos] = useState<Photo[]>([]);
+
+  // ==========================================
+  // QR 페이지 진입 시 세션의 사진 목록 조회 (GET)
+  // ==========================================
+  useEffect(() => {
+    if (page !== "save" || !sessionUuid) return;
+
+    const fetchPhotos = async () => {
+      try {
+        const res = await fetch(
+          `https://hellofriend-eulji.site/api/v1/booth/photos/${sessionUuid}`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setPhotos(data);
+        }
+      } catch (error) {
+        console.error("QR 페이지 사진 조회 실패:", error);
+      }
+    };
+
+    fetchPhotos();
+  }, [page, sessionUuid]);
 
   const pressNumber = (num: string) => {
     if (phoneNumber.length >= 11) return;
@@ -176,8 +207,13 @@ export default function ChooContent() {
           </div>
 
           <div className="photo-list">
-            {[1, 2, 3, 4, 5].map((item) => (
-              <div className="photo-placeholder" key={item}></div>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div className="photo-placeholder" key={i}>
+                {photos[i] && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={photos[i].imageUrl} alt={`photo-${i + 1}`} />
+                )}
+              </div>
             ))}
           </div>
 
