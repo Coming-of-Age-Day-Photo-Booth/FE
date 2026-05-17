@@ -9,6 +9,51 @@ const API_BASE_URL = "https://hellofriend-eulji.site";
 // 부스에서 촬영하는 사진 장수 (선택/QR/다운로드 페이지가 모두 5장 기준으로 동작)
 const TOTAL_PHOTOS = 5;
 
+// 사진 촬영 시 재생할 셔터음("찰칵")을 Web Audio API 로 합성한다.
+// 별도 음원 파일 없이 동작하며 오프라인에서도 문제없다.
+function playShutterSound() {
+  try {
+    const ctx = new AudioContext();
+    const duration = 0.12;
+
+    // 짧은 화이트노이즈 = 셔터 '찰칵' 의 클릭음
+    const buffer = ctx.createBuffer(
+      1,
+      Math.floor(ctx.sampleRate * duration),
+      ctx.sampleRate,
+    );
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+
+    // 고음역만 통과시켜 날카로운 클릭음으로 만든다
+    const filter = ctx.createBiquadFilter();
+    filter.type = "highpass";
+    filter.frequency.value = 1800;
+
+    // 빠른 어택 + 빠른 감쇠 = 짧고 또렷한 셔터음
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.8, now + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    source.start(now);
+    source.stop(now + duration);
+    source.onended = () => ctx.close();
+  } catch (err) {
+    console.warn("셔터음 재생 실패:", err);
+  }
+}
+
 const LionismBooth: React.FC = () => {
   useBoothScale();
   const router = useRouter();
@@ -102,6 +147,9 @@ const LionismBooth: React.FC = () => {
   // 3. [촬영] 비디오 화면 캡처 및 좌우반전 (기존 유지)
   const onCapture = async () => {
     if (photos.length >= TOTAL_PHOTOS) return;
+
+    // 촬영 순간 셔터음 재생
+    playShutterSound();
 
     let capturedImg = "";
 
