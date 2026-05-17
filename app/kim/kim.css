@@ -87,6 +87,11 @@
   background-color: #1a1a1a;
 }
 
+.kim-download-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 @media (min-width: 480px) {
   .kim-image-list {
     border-left: 2px solid #111;

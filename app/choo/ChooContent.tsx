@@ -118,7 +118,7 @@ export default function ChooContent() {
   // window.location.origin 을 쓰면 개발/배포 환경에 상관없이 항상 올바른 도메인이 된다.
   const mobileDownloadUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/kim?shortCode=${shortCode}`
+      ? `${window.location.origin}/kim?sessionUuid=${sessionUuid}`
       : "";
 
   return (
