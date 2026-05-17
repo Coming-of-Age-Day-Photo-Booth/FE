@@ -146,6 +146,8 @@ export default function AdminPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("전체");
+  // 전체 사진 다운로드 중인 주문의 shortCode (버튼 비활성화/표시용)
+  const [downloadingAll, setDownloadingAll] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -188,6 +190,40 @@ export default function AdminPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+  };
+
+  // 해당 주문의 촬영 사진 '전체'를 서버에서 받아 다운로드한다.
+  const handleDownloadAll = async (shortCode: string) => {
+    setDownloadingAll(shortCode);
+    try {
+      const res = await fetch(
+        `https://hellofriend-eulji.site/api/v1/admin/photos/all?shortCode=${encodeURIComponent(shortCode)}`,
+      );
+      if (!res.ok) {
+        alert("전체 사진을 불러오지 못했습니다.");
+        return;
+      }
+      // 응답이 문자열 배열이든 { imageUrl } 객체 배열이든 URL 목록으로 변환
+      const data = await res.json();
+      const urls: string[] = Array.isArray(data)
+        ? data.map((item: unknown) =>
+            typeof item === "string"
+              ? item
+              : (item as { imageUrl: string }).imageUrl,
+          )
+        : [];
+
+      if (urls.length === 0) {
+        alert("저장할 사진이 없습니다.");
+        return;
+      }
+      await handleDownload(urls);
+    } catch (error) {
+      console.error("전체 사진 다운로드 실패:", error);
+      alert("전체 사진 다운로드에 실패했습니다.");
+    } finally {
+      setDownloadingAll(null);
     }
   };
 
@@ -263,12 +299,13 @@ export default function AdminPage() {
                 <th>접수일시</th>
                 <th>진행상태</th>
                 <th>사진저장</th>
+                <th>전체저장</th>
               </tr>
             </thead>
             <tbody>
               {pageOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="admin-empty">검색 결과가 없습니다.</td>
+                  <td colSpan={7} className="admin-empty">검색 결과가 없습니다.</td>
                 </tr>
               ) : (
                 pageOrders.map((order, index) => (
@@ -296,6 +333,18 @@ export default function AdminPage() {
                         onClick={() => handleDownload(order.photos)}
                       >
                         <span className="admin-download-icon">↓</span> download
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        className="admin-download-btn"
+                        onClick={() => handleDownloadAll(order.shortCode)}
+                        disabled={downloadingAll === order.shortCode}
+                      >
+                        <span className="admin-download-icon">↓</span>{" "}
+                        {downloadingAll === order.shortCode
+                          ? "저장 중..."
+                          : "전체저장"}
                       </button>
                     </td>
                   </tr>
