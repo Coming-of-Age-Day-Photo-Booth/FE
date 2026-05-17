@@ -60,17 +60,20 @@ export default function ChooContent() {
 
   const pressNumber = (num: string) => {
     if (phoneNumber.length >= 11) return;
-
-    const nextNumber = phoneNumber + num;
-    setPhoneNumber(nextNumber);
-
-    if (nextNumber.length === 11) {
-      setPage("agree");
-    }
+    setPhoneNumber(phoneNumber + num);
   };
 
   const deleteNumber = () => {
     setPhoneNumber(phoneNumber.slice(0, -1));
+  };
+
+  // 확인 버튼: 전화번호 11자리를 모두 입력해야 다음 단계로 넘어간다
+  const handlePhoneConfirm = () => {
+    if (phoneNumber.length !== 11) {
+      alert("전화번호 11자리를 모두 입력해주세요.");
+      return;
+    }
+    setPage("agree");
   };
 
   const formatPhoneNumber = (value: string) => {
@@ -140,7 +143,13 @@ export default function ChooContent() {
               </button>
             ))}
 
-            <div></div>
+            <button
+              type="button"
+              className="confirm-btn"
+              onClick={handlePhoneConfirm}
+            >
+              확인
+            </button>
 
             <button type="button" onClick={() => pressNumber("0")}>
               0
