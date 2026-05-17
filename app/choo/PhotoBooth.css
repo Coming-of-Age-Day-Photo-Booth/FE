@@ -116,6 +116,13 @@ body {
   font-size: 22px !important;
 }
 
+.confirm-btn {
+  background: #0d99ff !important;
+  color: #ffffff !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+
 .next-btn {
   display: none;
 }
