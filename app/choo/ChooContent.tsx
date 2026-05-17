@@ -58,6 +58,14 @@ export default function ChooContent() {
     fetchPhotos();
   }, [page, sessionUuid]);
 
+  // QR 페이지에서 완료 버튼을 누르지 않으면 20초 후 자동으로 완료 처리한다.
+  // 완료 버튼을 누르면 page 가 바뀌면서 cleanup 으로 타이머가 취소된다.
+  useEffect(() => {
+    if (page !== "save") return;
+    const timer = setTimeout(() => setPage("done"), 20000);
+    return () => clearTimeout(timer);
+  }, [page]);
+
   const pressNumber = (num: string) => {
     if (phoneNumber.length >= 11) return;
     setPhoneNumber(phoneNumber + num);
@@ -232,7 +240,7 @@ export default function ChooContent() {
             ))}
           </div>
 
-          <button type="button" className="hidden-done-btn" onClick={() => setPage("done")}>
+          <button type="button" className="done-btn" onClick={() => setPage("done")}>
             완료
           </button>
         </section>
