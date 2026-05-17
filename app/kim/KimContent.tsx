@@ -58,22 +58,44 @@ export default function KimContent() {
 
     setIsDownloading(true);
     try {
+      // 1. 모든 사진을 File 객체로 변환 (S3 이미지에 CORS 허용이 되어 있어야 한다)
+      const files: File[] = [];
       for (let i = 0; i < photos.length; i++) {
-        try {
-          const res = await fetch(photos[i].imageUrl);
-          const blob = await res.blob();
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `lionism-photo-${i + 1}.jpg`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        } catch (err) {
-          console.error("개별 이미지 다운로드 실패:", err);
-        }
+        const res = await fetch(photos[i].imageUrl);
+        if (!res.ok) throw new Error(`이미지 응답 오류: ${res.status}`);
+        const blob = await res.blob();
+        files.push(
+          new File([blob], `lionism-photo-${i + 1}.jpg`, {
+            type: blob.type || "image/jpeg",
+          }),
+        );
       }
+
+      // 2. iOS/모바일: Web Share API → 공유 시트의 '이미지 저장'으로 사진 앱에 저장
+      //    (iOS는 <a download> 를 지원하지 않아 이 경로가 필수다)
+      if (navigator.canShare?.({ files })) {
+        await navigator.share({ files, title: "Lionism 포토부스" });
+        return;
+      }
+
+      // 3. 데스크톱/안드로이드: 파일 다운로드
+      for (let i = 0; i < files.length; i++) {
+        const url = URL.createObjectURL(files[i]);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = files[i].name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      // 사용자가 공유 시트를 직접 닫은 경우(AbortError)는 실패로 취급하지 않는다
+      if (err instanceof Error && err.name === "AbortError") return;
+      console.error("사진 저장 실패:", err);
+      alert(
+        "사진 저장에 실패했습니다. 사진을 길게 눌러 '사진에 저장'을 선택해 주세요.",
+      );
     } finally {
       setIsDownloading(false);
     }
